@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-three
+spec:
+  selector:
+    matchLabels:
+      app: three
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: three
+    spec:
+      containers:
+      - name: webapp
+        image: kodekloud/webapp-color
+        ports:
+        - containerPort: 8080
+        env:
+        - name: "APP_COLOR"
+          value: "blue"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-three
+spec:
+  selector:
+    app: three
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: NodePort
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-three
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: service-three
+              port:
+                number: 80

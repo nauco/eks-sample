@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-two
+spec:
+  selector:
+    matchLabels:
+      app: two
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: two
+    spec:
+      containers:
+      - name: webapp
+        image: kodekloud/webapp-color
+        ports:
+        - containerPort: 8080
+        env:
+        - name: "APP_COLOR"
+          value: "green"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-two
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: instance
+spec:
+  selector:
+    app: two
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer
+  loadBalancerClass: service.k8s.aws/nlb

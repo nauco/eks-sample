@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-one
+spec:
+  selector:
+    matchLabels:
+      app: one
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: one
+    spec:
+      containers:
+      - name: webapp
+        image: kodekloud/webapp-color
+        ports:
+        - containerPort: 8080
+        env:
+        - name: "APP_COLOR"
+          value: "pink"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-one
+spec:
+  selector:
+    app: one
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer
